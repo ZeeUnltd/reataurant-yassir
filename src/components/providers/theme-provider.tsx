@@ -14,6 +14,7 @@ type ThemeProviderState = {
 const initialState = {
   theme: "system",
   setTheme: () => null,
+  authenticated: true, // TODO: add authentication logic
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);

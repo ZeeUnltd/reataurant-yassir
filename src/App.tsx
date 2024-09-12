@@ -15,7 +15,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
           </Route>
 
           <Route path="/auth" element={<Auth />} />

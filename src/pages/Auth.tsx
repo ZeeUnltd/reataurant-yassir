@@ -11,7 +11,8 @@ const Auth = () => {
       <H1>Auth</H1>
       <H2>Look's like you are not authenticated</H2>
       <H4 className="mt-2 text-muted-foreground">
-        Checkout <InlineCode>@/components/ui/protected-route.tsx</InlineCode> to
+        Checkout 
+        <InlineCode>@/components/ui/protected-route.tsx</InlineCode> to
         add protected contents logic.
       </H4>
     </Wrapper>

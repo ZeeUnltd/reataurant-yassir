@@ -1,35 +1,38 @@
-"use client"
+"use client";
 
-import { Cross2Icon } from "@radix-ui/react-icons"
-import { Table } from "@tanstack/react-table"
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Table } from "@tanstack/react-table";
+import { DatePickerWithRange } from "@/components/ui/dateRangePicker";
+import { Button } from "@/components/ui/button-newyork";
+import { Input } from "@/components/ui/input-newyork";
+import { DataTableViewOptions } from "@/components/ui/data-table-view-options";
 
-import { Button } from "@/registry/new-york/ui/button"
-import { Input } from "@/registry/new-york/ui/input"
-import { DataTableViewOptions } from "@/app/(app)/examples/tasks/components/data-table-view-options"
-
-import { priorities, statuses } from "../data/data"
-import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter";
+import { statuses, areas, shifts } from "@/lib/data";
 
 interface DataTableToolbarProps<TData> {
-  table: Table<TData>
+  table: Table<TData>;
 }
 
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0
-
+  const isFiltered = table.getState().columnFilters.length > 0;
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between w-full">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Filter tasks..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+          placeholder="Filter by name..."
+          value={
+            (table.getColumn("lastName")?.getFilterValue() as string) ?? ""
           }
+          onChange={(event) => {
+            table.getColumn("lastName")?.setFilterValue(event.target.value);
+            table.getColumn("firstName")?.setFilterValue(event.target.value);
+          }}
           className="h-8 w-[150px] lg:w-[250px]"
         />
+        <DatePickerWithRange />
         {table.getColumn("status") && (
           <DataTableFacetedFilter
             column={table.getColumn("status")}
@@ -37,11 +40,18 @@ export function DataTableToolbar<TData>({
             options={statuses}
           />
         )}
-        {table.getColumn("priority") && (
+        {table.getColumn("shift") && (
           <DataTableFacetedFilter
-            column={table.getColumn("priority")}
-            title="Priority"
-            options={priorities}
+            column={table.getColumn("shift")}
+            title="Shift"
+            options={shifts}
+          />
+        )}
+        {table.getColumn("area") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("area")}
+            title="Area"
+            options={areas}
           />
         )}
         {isFiltered && (
@@ -55,7 +65,9 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div>
+        <DataTableViewOptions table={table} />
+      </div>
     </div>
-  )
+  );
 }

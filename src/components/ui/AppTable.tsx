@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,21 +12,23 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+// import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button";
+import { statuses } from "@/lib/data";
+// import { Checkbox } from "@/components/ui/checkbox"
+import { DataTableToolbar } from "@/components/ui/DataToolBox";
+// import {
+//   DropdownMenu,
+//   DropdownMenuCheckboxItem,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu"
+// import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -34,31 +36,108 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import mockData from '@/lib/mock_data.json'
-import { Reservation } from "@/types/reservationTypes"
+} from "@/components/ui/table";
+import mockData from "@/lib/mock_data.json";
+import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
+import { Reservation } from "@/types/reservationTypes";
 
-const data: Reservation[] =  mockData.reservations
+const data: Reservation[] = mockData.reservations;
 
 export const columns: ColumnDef<Reservation>[] = [
   {
     accessorKey: "id",
-    header: "ID",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="ID" />
+    ),
+  },
+  {
+    accessorKey: "businessDate",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Date" />
+    ),
+    cell: ({ row }) => {
+      const dateValue = row.getValue("businessDate");
+      if (typeof dateValue === "string") {
+        // Split the date string and rearrange it to year-month-day format
+        const [day, month, year] = dateValue.split(".");
+        const date = new Date(`${year}-${month}-${day}`);
+
+        // Check if the date is valid
+        if (!isNaN(date.getTime())) {
+          return (
+            <div>
+              {date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </div>
+          );
+        }
+      }
+      return <div>Invalid Date</div>;
+    },
   },
   {
     accessorKey: "customer.firstName",
-    header: "First Name",
+    id: "firstName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="First Name" />
+    ),
+    filterFn: (row, id, value) => {
+      id
+      return (
+        row.original.customer.lastName.toLowerCase().includes(value.toLowerCase()) ||
+        row.original.customer.firstName.toLowerCase().includes(value.toLowerCase())
+      );
+    },
   },
   {
     accessorKey: "customer.lastName",
-    header: "Last Name",
+    id: "lastName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Name" />
+    ),
+    enableColumnFilter: true,
+    filterFn: (row, id, value) => {
+      id
+      return (
+        // if array is flat, do below
+        // row.getValue("firstName").toLowerCase().includes(value.toLowerCase()) ||
+        // row.getValue("lastName").toLowerCase().includes(value.toLowerCase())
+        row.original.customer.lastName.toLowerCase().includes(value.toLowerCase()) ||
+        row.original.customer.firstName.toLowerCase().includes(value.toLowerCase())
+      );
+    },
+  },
+  {
+    accessorKey: "quantity",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Guests" />
+    ),
+    cell: ({ row }) => {
+      return <div>{row.getValue("quantity")}</div>;
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "start",
     header: "Start Time",
     cell: ({ row }) => {
       const date = new Date(row.getValue("start"));
-      return <div>{date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>;
+      return (
+        <div>
+          {date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </div>
+      );
     },
   },
   {
@@ -66,39 +145,37 @@ export const columns: ColumnDef<Reservation>[] = [
     header: "End Time",
     cell: ({ row }) => {
       const date = new Date(row.getValue("end"));
-      return <div>{date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>;
-    },
-  },
-  {
-    accessorKey: "quantity",
-    header: "Guests",
-  },
-  {
-    accessorKey: "businessDate",
-    header: "Date",
-    cell: ({ row }) => {
-      const dateValue = row.getValue("businessDate");
-      if (typeof dateValue === 'string') {
-        // Split the date string and rearrange it to year-month-day format
-        const [day, month, year] = dateValue.split('.');
-        const date = new Date(`${year}-${month}-${day}`);
-        
-        // Check if the date is valid
-        if (!isNaN(date.getTime())) {
-          return <div>{date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div>;
-        }
-      }
-      return <div>Invalid Date</div>;
+      return (
+        <div>
+          {date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </div>
+      );
     },
   },
   {
     accessorKey: "status",
+    // cell: ({ row }) => (
+    //   <div className="capitalize">{row.getValue("status")}</div>
+    // ),
     header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
-    ),
-    enableSorting: true,
-    enableHiding: true,
+    cell: ({ row }) => {
+      const status = statuses.find(
+        (status) => status.value === row.getValue("status")
+      );
+      if (!status) {
+        return null;
+      }
+      return <div className="capitalize">{row.getValue("status")}</div>;
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "shift",
@@ -113,16 +190,16 @@ export const columns: ColumnDef<Reservation>[] = [
     header: "Notes",
   },
   // ... you can keep or modify the actions column if needed
-]
+];
 
 export function AppTable() {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
+  );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -141,20 +218,22 @@ export function AppTable() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
+  console.log(table.getState().columnFilters);
   return (
     <section className="w-full">
       <div className="flex items-center py-4">
-        <Input
+        {/* <Input
           placeholder="Filter Name, Surname..."
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
-        />
-        <DropdownMenu>
+        /> */}
+        <DataTableToolbar table={table} />
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
               Columns <ChevronDown className="ml-2 h-4 w-4" />
@@ -179,7 +258,7 @@ export function AppTable() {
                 )
               })}
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
       <div className="rounded-md border">
         <Table>
@@ -196,7 +275,7 @@ export function AppTable() {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -255,7 +334,6 @@ export function AppTable() {
           </Button>
         </div>
       </div>
-      
     </section>
-  )
+  );
 }

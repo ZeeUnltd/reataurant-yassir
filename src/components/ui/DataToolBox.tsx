@@ -32,7 +32,7 @@ export function DataTableToolbar<TData>({
           }}
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        <DatePickerWithRange />
+        {/* <DatePickerWithRange /> */}
         {table.getColumn("status") && (
           <DataTableFacetedFilter
             column={table.getColumn("status")}

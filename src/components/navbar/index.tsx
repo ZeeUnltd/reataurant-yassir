@@ -8,7 +8,9 @@ import { Link } from "react-router-dom";
 const navbar = () => {
   return (
     <header className="fixed top-0 overflow-hidden w-full flex items-center justify-between px-4 h-16 z-10 border-b backdrop-blur-md">
-      <H4>Boilerplate App</H4>
+      <div>
+        <img src="https://yassir.com/images/common/logo-yassir-forward-light.svg" alt="Yassir logo" height={100} width={100} />
+      </div>
       <div className="flex items-center justify-center gap-4">
         <NavLinks />
         <Link
